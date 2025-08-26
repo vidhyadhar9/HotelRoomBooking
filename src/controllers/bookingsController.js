@@ -10,50 +10,49 @@ const bookRoom = async (req, res) => {
   try {
     const { userName, hotelName, city, roomNumber, startDate, endDate } = req.body;
 
+    // Find hotel and room
     const hotel = await Hotel.findOne({ name: hotelName, city }).session(session);
     if (!hotel) throw new Error("Hotel not found in the given city.");
 
     const room = await Room.findOne({ hotel: hotel._id, roomNumber }).session(session);
     if (!room) throw new Error("Room not found in this hotel.");
-    if (!room.isAvailable) throw new Error("Room is under Maintenance.");
+    if (!room.isAvailable) throw new Error("Room is under maintenance.");
 
-    // ✅ Atomic booking creation with overlap check
-    const booking = await Booking.findOneAndUpdate(
-      {
-        room: room._id,
-        $nor: [
-          // Case 1: startDate falls inside existing booking
-          { startDate: { $lte: new Date(endDate), $gte: new Date(startDate) } },
-          // Case 2: endDate falls inside existing booking
-          { endDate: { $gte: new Date(startDate), $lte: new Date(endDate) } },
-          // Case 3: booking fully covers the requested range
-          { startDate: { $lte: new Date(startDate) }, endDate: { $gte: new Date(endDate) } },
-        ],
-      },
-      {
-        $setOnInsert: {
-          userName,
-          room: room._id,
-          hotel: hotel._id,
-          startDate: new Date(startDate),
-          endDate: new Date(endDate),
-        },
-      },
-      {
-        new: true,
-        upsert: true,
-        session,
-      }
-    );
+    const start = new Date(startDate);
+    const end = new Date(endDate);
 
-    if (!booking) {
+    // Validate dates
+    if (start > end) {
+      return res.status(400).json({ message: "Invalid date range: startDate must be before or equal to endDate" });
+    }
+
+    // Step 1: Check for overlapping bookings
+    const overlappingBooking = await Booking.findOne({
+      room: room._id,
+      startDate: { $lte: end },
+      endDate: { $gte: start }
+    }).session(session);
+
+    if (overlappingBooking) {
       throw new Error("Room already booked for the selected date range.");
     }
+
+    // Step 2: Create booking
+    const newBooking = await Booking.create(
+      [{
+        userName,
+        room: room._id,
+        hotel: hotel._id,
+        startDate: start,
+        endDate: end
+      }],
+      { session }
+    );
 
     await session.commitTransaction();
     session.endSession();
 
-    return res.status(201).json({ message: "Room booked successfully", booking });
+    return res.status(201).json({ message: "Room booked successfully", booking: newBooking[0] });
 
   } catch (err) {
     await session.abortTransaction();

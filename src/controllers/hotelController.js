@@ -22,7 +22,7 @@ const createHotel = async (req, res) => {
     // Invalidate cache (since new data added)
     // await redisClient.flushAll();
 
-    return res.status(201).json(hotel);
+    return res.status(201).send({message :"hotel inserted successfully with details", hotel });
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }

@@ -8,7 +8,7 @@ const bookingRequests = [
     userName: "Alice",
     hotelName: "Taj",
     city: "Mumbai",
-    roomNumber: 1,
+    roomNumber: 2,
     startDate: "2025-01-10",
     endDate: "2025-01-10"
   },
@@ -16,7 +16,7 @@ const bookingRequests = [
     userName: "Bob",
     hotelName: "Taj",
     city: "Mumbai",
-    roomNumber: 1,
+    roomNumber: 2,
     startDate: "2025-01-10",
     endDate: "2025-01-10"
   },
@@ -24,7 +24,7 @@ const bookingRequests = [
     userName: "Charlie",
     hotelName: "Taj",
     city: "Mumbai",
-    roomNumber: 1,
+    roomNumber: 2,
     startDate: "2025-01-10",
     endDate: "2025-01-11"
   }

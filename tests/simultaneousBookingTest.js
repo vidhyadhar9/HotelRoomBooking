@@ -9,16 +9,16 @@ const bookingRequests = [
     hotelName: "Taj",
     city: "Mumbai",
     roomNumber: 2,
-    startDate: "2025-06-10",
-    endDate: "2025-06-15"
+    startDate: "2025-06-30",
+    endDate: "2025-06-30"
   },
   {
     userName: "Bob",
     hotelName: "Taj",
     city: "Mumbai",
     roomNumber: 2,
-    startDate: "2025-06-11", // Overlaps with Alice
-    endDate: "2025-06-16"
+    startDate: "2025-06-30",
+    endDate: "2025-06-30"
   }
 ];
 

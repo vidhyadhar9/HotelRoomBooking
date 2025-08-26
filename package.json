@@ -12,6 +12,7 @@
     "axios": "^1.11.0",
     "dotenv": "^17.2.1",
     "express.js": "^1.0.0",
-    "mongoose": "^8.18.0"
+    "mongoose": "^8.18.0",
+    "redis": "^5.8.2"
   }
 }

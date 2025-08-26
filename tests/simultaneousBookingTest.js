@@ -8,17 +8,25 @@ const bookingRequests = [
     userName: "Alice",
     hotelName: "Taj",
     city: "Mumbai",
-    roomNumber: 2,
-    startDate: "2025-06-30",
-    endDate: "2025-06-30"
+    roomNumber: 1,
+    startDate: "2025-01-10",
+    endDate: "2025-01-10"
   },
   {
     userName: "Bob",
     hotelName: "Taj",
     city: "Mumbai",
-    roomNumber: 2,
-    startDate: "2025-06-30",
-    endDate: "2025-06-30"
+    roomNumber: 1,
+    startDate: "2025-01-10",
+    endDate: "2025-01-10"
+  },
+  {
+    userName: "Charlie",
+    hotelName: "Taj",
+    city: "Mumbai",
+    roomNumber: 1,
+    startDate: "2025-01-10",
+    endDate: "2025-01-11"
   }
 ];
 

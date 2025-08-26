@@ -13,7 +13,7 @@ const redisClient = redis.createClient({
 // const CACHE_TTL = 60; // seconds (1 min)
 
 // Create a new hotel
-createHotel = async (req, res) => {
+const createHotel = async (req, res) => {
   try {
     const { name, city, address, rating } = req.body;
     const hotel = new Hotel({ name, city, address, rating });
@@ -22,58 +22,63 @@ createHotel = async (req, res) => {
     // Invalidate cache (since new data added)
     // await redisClient.flushAll();
 
-    res.status(201).json(hotel);
+    return res.status(201).json(hotel);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    return res.status(500).json({ message: error.message });
   }
 };
 
 // Search hotels with Redis cache
-searchHotels = async (req, res) => {
+const searchHotels = async (req, res) => {
   try {
     const { city, name, sortByRating } = req.query;
 
     // Build query object
     let query = {};
-    if (city) query.city = new RegExp(city, "i");
-    if (name) query.name = new RegExp(name, "i");
+if (city) query.city = new RegExp(city, "i");
+if (name) query.name = new RegExp(name, "i");
 
-    // Sorting
-    let sort = {};
-    if (sortByRating) {
-      sort.rating = sortByRating.toLowerCase() === "desc" ? -1 : 1;
-    } else {
-      sort.rating = -1; // default: highest first
-    }
+// Sorting
+let sort = {};
+if (sortByRating) {
+  sort.rating = sortByRating.toLowerCase() === "desc" ? -1 : 1;
+} else {
+  sort.rating = -1; // default: highest first
+}
 
-    // 🔹 Generate a cache key (unique per query)
-    const cacheKey = `hotels:${JSON.stringify(query)}:sort:${JSON.stringify(sort)}`;
+// Redis cache key
+// const cacheKey = `hotels:${JSON.stringify(query)}:sort:${JSON.stringify(sort)}:page:${page}:limit:${limit}`;
 
-    // 🔹 Check Redis cache
-    // const cachedData = await redisClient.get(cacheKey);
-    // if (cachedData) {
-    //   console.log("⚡ Serving from Redis cache");
-    //   return res.json(JSON.parse(cachedData));
-    // }
+// Check Redis cache (if enabled)
+// const cachedData = await redisClient.get(cacheKey);
+// if (cachedData) {
+//   console.log("⚡ Serving from Redis cache");
+//   return res.json(JSON.parse(cachedData));
+// }
 
-    // 🔹 If not cached → query DB
-    const hotels = await Hotel.find(query).sort(sort);
+const page = parseInt(req.query.page) || 1;
+const limit = parseInt(req.query.limit) || 20;
 
-    const response = {
-      success: true,
-      count: hotels.length,
-      hotels,
-    };
+const hotels = await Hotel.find(query)  // using query directly
+  .sort(sort)
+  .skip((page - 1) * limit)
+  .limit(limit);
 
-    // 🔹 Store in Redis with TTL
-    // await redisClient.setEx(cacheKey, CACHE_TTL, JSON.stringify(response));
+const response = {
+  success: true,
+  count: hotels.length,
+  hotels,
+};
 
-    console.log("✅ Served from MongoDB & cached");
+// Store in Redis (if enabled)
+// await redisClient.setEx(cacheKey, CACHE_TTL, JSON.stringify(response));
 
-    res.json(response);
+console.log("✅ Served from MongoDB & cached");
+return res.json(response);
+
   } catch (err) {
     console.error("Error searching hotels:", err);
-    res.status(500).json({ success: false, message: "Server error" });
+    return res.status(500).json({ success: false, message: "Server error" });
   }
 };
 

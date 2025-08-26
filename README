@@ -1,0 +1,154 @@
+Hotel Search API Documentation
+1. Overview
+
+The Hotel Search API is a high-performance backend service built with Node.js, Express, MongoDB, and Redis. It provides users the ability to search for hotels based on multiple criteria, sort results, paginate large datasets, and leverage caching for faster query responses.
+
+Key Features:
+
+Insert the Rooms and Hotels 
+
+Room Books and handled overlapping room books
+
+Search by hotel name and city (case-insensitive, partial matches)
+
+Sort results by hotel rating-->based on user preference
+
+Pagination to efficiently handle large datasets (1M+ records)
+
+Redis caching for improved performance on repeated queries
+
+2. System Requirements
+
+Software:
+
+Node.js >= 18
+
+MongoDB (local or cloud)
+
+Redis (running locally or via WSL2 on Windows)
+
+Operating System:
+
+Windows 10/11 with WSL2 for Redis, or Linux/macOS
+
+3. Environment Setup
+3.1 Clone Repository
+git clone https://github.com/yourusername/hotel-search-api.git
+cd hotel-search-api
+
+3.2 Install Dependencies
+npm install
+
+3.3 Environment Configuration
+
+Create a .env file at the project root:
+
+MONGO_URI= localmongoDb or mongoose string  with database    HotelBooking
+REDIS_HOST=127.0.0.1
+REDIS_PORT=6379
+CACHE_TTL=3600
+PORT=3000 or any port 
+
+
+optional
+<!-- 4. Running Redis on Windows using WSL
+
+Install WSL2 (if not already installed):
+
+wsl --install
+wsl --set-default-version 2
+
+
+Open Ubuntu terminal and install Redis:
+
+curl -fsSL https://packages.redis.io/gpg | sudo gpg --dearmor -o /usr/share/keyrings/redis-archive-keyring.gpg
+echo "deb [signed-by=/usr/share/keyrings/redis-archive-keyring.gpg] https://packages.redis.io/deb $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/redis.list
+sudo apt-get update
+sudo apt-get install redis
+
+
+Start Redis server:
+
+sudo service redis-server start
+
+
+Test Redis connection:
+
+redis-cli ping
+# Expected output: PONG -->
+
+5. Database Setup
+install mongoose (cloud atlas ) or mongoDb for local
+Database name HotelBooking
+collections will be created when we run the code
+
+FYI --> bookings
+        hotels
+        rooms
+
+
+Run command :   npm src/app.js
+http://localhost:3000
+
+
+URLS :
+
+post :
+
+    http://localhost:3000/hotels/create --creation of the hotels
+
+    json body : exmaple
+{
+  "name": "Trident Nariman Point",
+  "city": "Mumbai",
+  "address": "Nariman Point, Mumbai",
+  "rating": 4
+}
+
+http://localhost:3000/rooms/create
+
+{
+    "hotelName": "Taj",
+    "city" : "Mumbai",
+    "roomNumber" : 1,
+    "roomType" : "Suite",//Singel /Double (casesensitive)
+    "price"   : 3000
+}
+
+
+http://localhost:3000/bookings/rooms
+
+{
+  "userName": "Ram",
+  "hotelName": "Taj",
+  "city": "Mumbai",
+  "roomNumber": 2,
+  "startDate": "2025-01-03",
+  "endDate": "2025-01-04"
+}
+
+
+
+get urls;
+
+http://localhost:3000/hotels/search
+
+parameters :
+name =  taj
+city = hyderabad
+
+
+
+
+
+for concurrent user testing i have provided testcase and along with file int tests folder
+
+go to other terminal and run test/simultaneousBookingTest.js 
+while node src/app.js in other terminal
+
+
+simply run "node src/app.js" in one terminal
+and move to other terminal and run test/simultaneousBookingTest.js 
+
+you can see only 1 overlapping booking get passed
+

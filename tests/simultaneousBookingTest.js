@@ -9,25 +9,17 @@ const bookingRequests = [
     hotelName: "Taj",
     city: "Mumbai",
     roomNumber: 2,
-    startDate: "2025-01-10",
-    endDate: "2025-01-10"
+    startDate: "2025-11-18",
+    endDate: "2025-11-20"
   },
   {
     userName: "Bob",
     hotelName: "Taj",
     city: "Mumbai",
     roomNumber: 2,
-    startDate: "2025-01-10",
-    endDate: "2025-01-10"
+    startDate: "2025-11-18",
+    endDate: "2025-11-20"
   },
-  {
-    userName: "Charlie",
-    hotelName: "Taj",
-    city: "Mumbai",
-    roomNumber: 2,
-    startDate: "2025-01-10",
-    endDate: "2025-01-11"
-  }
 ];
 
 async function testSimultaneousBookings() {

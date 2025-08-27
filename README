@@ -77,6 +77,9 @@ Test Redis connection:
 redis-cli ping
 # Expected output: PONG -->
 
+
+<!-- Redis code is commented because of redis issue but if redis is working fine in local can use the code -->
+
 5. Database Setup
 install mongoose (cloud atlas ) or mongoDb for local
 Database name HotelBooking

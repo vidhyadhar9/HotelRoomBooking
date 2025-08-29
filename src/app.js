@@ -15,7 +15,7 @@ app.use("/hotels", hotelsRouter);
 app.use("/rooms", roomsRouter);
 app.use("/bookings", bookingsRouter);
 
-mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost:27017/hotel_booking")
+mongoose.connect(process.env.MONGODB_URI || "mongodb://127.0.0.1:27017/HotelBooking")
   .then(() => {
     console.log("✅ MongoDB connected");
     app.listen(process.env.PORT || 3000, () => {

@@ -31,56 +31,47 @@ const createHotel = async (req, res) => {
 // Search hotels with Redis cache
 const searchHotels = async (req, res) => {
   try {
-    const { city, name, sortByRating } = req.query;
+    const { name ,city, sortByRating, page = 1, limit } = req.query;
 
     // Build query object
+    console.log("Search Parameters:", req.query);
+    
     let query = {};
-if (city) query.city = new RegExp(city, "i");
-if (name) query.name = new RegExp(name, "i");
+    if (city) query.city = city;
+    if (name) query.name = name;
 
-// Sorting
-let sort = {};
-if (sortByRating) {
-  sort.rating = sortByRating.toLowerCase() === "desc" ? -1 : 1;
-} else {
-  sort.rating = -1; // default: highest first
-}
 
-// Redis cache key
-// const cacheKey = `hotels:${JSON.stringify(query)}:sort:${JSON.stringify(sort)}:page:${page}:limit:${limit}`;
+    console.log("Search Query:", query);
+    // Sorting
+    let sort = {};
+    if (sortByRating) {
+      sort.rating = sortByRating.toLowerCase() === "desc" ? -1 : 1;
+    } else {
+      sort.rating = -1; // default: highest first
+    }
+    const startTime = Date.now();
+    const hotels = await Hotel.find(query)
+      .sort(sort)
+      .skip((page - 1) * limit)
+      .limit(parseInt(limit))
 
-// Check Redis cache (if enabled)
-// const cachedData = await redisClient.get(cacheKey);
-// if (cachedData) {
-//   console.log("⚡ Serving from Redis cache");
-//   return res.json(JSON.parse(cachedData));
-// }
+    const endTime = Date.now();
+    const response = {
+      success: true,
+      count: hotels.length,
+      data: hotels,
+      timeTaken: `${endTime - startTime} ms`
+    };
 
-const page = parseInt(req.query.page) || 1;
-const limit = parseInt(req.query.limit) || 20;
-
-const hotels = await Hotel.find(query)  // using query directly
-  .sort(sort)
-  .skip((page - 1) * limit)
-  .limit(limit);
-
-const response = {
-  success: true,
-  count: hotels.length,
-  hotels,
-};
-
-// Store in Redis (if enabled)
-// await redisClient.setEx(cacheKey, CACHE_TTL, JSON.stringify(response));
-
-console.log("✅ Served from MongoDB & cached");
-return res.json(response);
+    console.log("✅ Served from MongoDB with strict search");
+    return res.json(response);
 
   } catch (err) {
     console.error("Error searching hotels:", err);
     return res.status(500).json({ success: false, message: "Server error" });
   }
 };
+
 
 module.exports = {
   createHotel,

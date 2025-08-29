@@ -177,3 +177,17 @@ and move to other terminal and run test/simultaneousBookingTest.js
 
 you can see only 1 overlapping booking get passed
 
+
+
+
+added pagination to avoid Db timeouts and for optimised searches
+
+added time for the query to notice the benchmark 
+
+added extra file to insert random hotels data
+
+
+
+run generateHotels file separately to insert 1M Hotels data(random data)
+
+

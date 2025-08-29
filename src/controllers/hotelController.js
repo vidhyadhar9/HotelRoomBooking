@@ -6,11 +6,11 @@ const redisClient = redis.createClient({
   url: "redis://127.0.0.1:6379", // adjust if Redis runs elsewhere
 });
 
-// redisClient.connect()
-//   .then(() => console.log("✅ Connected to Redis"))
-//   .catch((err) => console.error("❌ Redis connection error:", err));
+redisClient.connect()
+  .then(() => console.log("✅ Connected to Redis"))
+  .catch((err) => console.error("❌ Redis connection error:", err));
 
-// const CACHE_TTL = 60; // seconds (1 min)
+const CACHE_TTL = 600; // seconds (10 min)
 
 // Create a new hotel
 const createHotel = async (req, res) => {
@@ -49,11 +49,25 @@ const searchHotels = async (req, res) => {
     } else {
       sort.rating = -1; // default: highest first
     }
+
+    const cacheKey = `hotels:${JSON.stringify(query)}:sort:${JSON.stringify(sort)}:page:${page}:limit:${limit}`;
+
+    // Check Redis cache
+    const cachedData = await redisClient.get(cacheKey);
+    if (cachedData) {
+      console.log("⚡ Served from Redis cache");
+      return res.json(JSON.parse(cachedData));
+    }
+
+    
     const startTime = Date.now();
     const hotels = await Hotel.find(query)
       .sort(sort)
       .skip((page - 1) * limit)
       .limit(parseInt(limit))
+
+    // Store result in Redis cache
+    redisClient.setEx(cacheKey, CACHE_TTL, JSON.stringify(hotels));
 
     const endTime = Date.now();
     const response = {
@@ -63,7 +77,7 @@ const searchHotels = async (req, res) => {
       timeTaken: `${endTime - startTime} ms`
     };
 
-    console.log("✅ Served from MongoDB with strict search");
+    console.log("✅ Served from MongoDB or Redis cache with strict search");
     return res.json(response);
 
   } catch (err) {

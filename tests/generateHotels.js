@@ -14,8 +14,8 @@ const generateHotels = async () => {
 
     for (let i = 0; i < totalRecords; i++) {
       bulk.push({
-        name: `Hotel_${i}`,
-        city: `City_${i % 1000}`,
+        name: `Hotel_${i%10000}`,
+        city: `City_${i % 100}`,
         address: `Address_${i}`,
         rating: Math.floor(Math.random() * 5) + 1,
       });

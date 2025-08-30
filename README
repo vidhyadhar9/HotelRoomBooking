@@ -13,7 +13,7 @@ Search by hotel name and city (case-insensitive, partial matches)
 
 Sort results by hotel rating-->based on user preference
 
-Pagination to efficiently handle large datasets (1M+ records)
+Pagination to efficiently handle large datasets (1M+ records) + indexing(effective searching)
 
 Redis caching for improved performance on repeated queries
 
@@ -191,3 +191,5 @@ added extra file to insert random hotels data
 run generateHotels file separately to insert 1M Hotels data(random data)
 
 
+and use this below url;
+http://localhost:3000/hotels/search?name=Hotel_5&limit=60
